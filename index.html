@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<style>
+		body {
+			background-color: lightblue;
+		}
+		.game {
+			background-color: white;
+			border-style: double;
+			padding: 10px;
+			width: 750px;
+			margin: auto;
+			text-align: center;
+			font-family:courier;
+		}
+		
+		.board{
+			text-align: center;
+		}
+		
+		.grid{
+			font-family:courier;
+		}
+		
+		.title{
+			text-align: center;
+		}
+		
+	</style>
+	<title>Number Neighbourhoods</title>
+</head>
+
+<body onload="generateNums()">
+	<div class="game">
+
+		<h2 class="title">Number Neighbourhoods</h2>
+		<p> A game of analytic deduction by David K Butler.  Explanation document: <a href=https://www.adelaide.edu.au/mathslearning/play/number-neighbourhoods.pdf> https://www.adelaide.edu.au/mathslearning/play/number-neighbourhoods.pdf</a> <br /><br /> note: I've scaled the playfield from 0-10 with one decimal place to 0-100 without decimals.  <br /><br />The suggestion and guess fields will allow decimal guesses (eg 0.5 either side of 50).  It will also accept negatives and numbers outside the range however the behaviour may not be expected or even correct for these cases.</p>
+		
+	</div>
+	</br>
+	
+	<div class="game">
+		<p id="suggestion">I suggest all the numbers less than <input type="number" id="dist" min="0" max="100"> units away from <input type="number" id="centre" min="0" max="100"> <button type="button" onclick="suggest()" id="suggestButton">Suggest</button></p>
+		<p><b>Suggestion History:</b></p>
+		<p id="suggestionHistory"></p>
+		
+	</div>
+	
+	</br>
+	
+	<div class="game">
+		<p id="accusation">I accuse the set (<input type="number" id="n0" min="1" max="99">,<input type="number" id="n1" min="1" max="99">)⋃(<input type="number" id="n2" min="1" max="99">,<input type="number" id="n3" min="1" max="99">)⋃(<input type="number" id="n4" min="1" max="99">,<input type="number" id="n5" min="1" max="99">)   <button type="button" onclick="accuse()" id="accuseButton">ACCUSE</button></p>
+		<p id="result"><p>
+	</div>
+	
+	</br>
+	
+<!--	<div class="game">
+		<p id="testing">lala</p>
+		<p id="testing2">lala2</p>
+-->
+	</div>
+</body>
+
+<script type="text/javascript">
+	var nums = [0,0,0,0,0,0];	
+
+	function generateNums(){		
+		for(i=0; i < 6; i++){
+			//var debugstring = document.getElementById("testing").innerHTML;
+			//document.getElementById("testing").innerHTML = debugstring.toString() + i.toString();
+			var candidate = 0;
+			do{
+				candidate = Math.floor(Math.random()*100);
+			}while(nums.includes(candidate));
+			nums[i] = candidate;
+		}
+		nums.sort(function(a, b){return a - b});
+		//document.getElementById("testing").innerHTML = nums;
+		//document.getElementById("testing").innerHTML = printCompSet();
+	}
+	function suggest(){
+		
+		var sh = document.getElementById("suggestionHistory").innerHTML;
+		var res = "inside/outside/both";
+		
+		var lowerb = (document.getElementById("centre").value) - (document.getElementById("dist").value);
+		var upperb = parseFloat(document.getElementById("centre").value) + parseFloat(document.getElementById("dist").value);
+		
+		if( (lowerb >= nums[0] && upperb <= nums[1]) || (lowerb >= nums[2] && upperb <= nums[3]) || (lowerb >= nums[4] && upperb <= nums[5]) ){
+			res = "inside";
+		} 
+		else if( (upperb <= nums[0]) || (lowerb >= nums[1] && upperb <= nums[2]) || (lowerb >= nums[3] && upperb <= nums[4]) || (lowerb >= nums[5]) ){
+			res = "outside";
+		} 
+		else{
+			res = "both";
+		}
+		
+		sh = "<pre>("+lowerb.toString()+","+upperb.toString()+"): "+res+"</pre>"+sh;
+		document.getElementById("suggestionHistory").innerHTML = sh;
+	}
+	
+	function accuse(){
+		var guess = [parseInt(document.getElementById("n0").value), parseInt(document.getElementById("n1").value), parseInt(document.getElementById("n2").value), parseInt(document.getElementById("n3").value), parseInt(document.getElementById("n4").value), parseInt(document.getElementById("n5").value) ];
+		
+		var i;
+		
+//		document.getElementById("testing").innerHTML = guess;
+//		document.getElementById("testing2").innerHTML = nums;
+
+		for(i=0;i<6;i++){
+			if(parseInt(guess[i]) != parseInt(nums[i])){
+				document.getElementById("result").innerHTML = "Bad Luck! <pre>"+printCompSet()+"</pre>";
+				return;
+			}
+		}
+			
+		document.getElementById("result").innerHTML = "Congratulations! <pre>"+printCompSet()+"</pre>";
+
+	}	
+	
+	function printCompSet(){
+		return "Computer's set is (" + nums[0].toString() + ", "+nums[1].toString()+") ⋃ ("+nums[2].toString()+", "+nums[3].toString()+") ⋃ ("+nums[4].toString()+", "+nums[5].toString()+")";
+	}
+	
+	
+</script>
+</html>
